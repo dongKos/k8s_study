@@ -9,7 +9,7 @@ class K8sStudyApplicationTests {
 
     @Test
     fun contextLoads() {
-        throw RuntimeException()
+//        throw RuntimeException()
     }
 
 }
