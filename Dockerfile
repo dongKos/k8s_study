@@ -1,22 +1,17 @@
-FROM openjdk:11
-#COPY build/libs/*SNAPSHOT.jar app.jar
-#ENTRYPOINT ["java","-jar","/app.jar"]
+FROM adoptopenjdk:11-jdk-hotspot AS builder
+# the latest OpenJDK 8 with HotSpot JDK image + 빌드용
+COPY gradlew .
+COPY settings.gradle.kts .
+COPY build.gradle.kts .
+COPY gradle gradle
+COPY src src
+RUN chmod +x ./gradlew
+RUN ./gradlew bootJar
 
-#COPY gradlew .
-#COPY gradle gradle
-#COPY build.gradle.kts .
-#COPY settings.gradle.kts .
-#COPY src src
-#RUN chmod +x ./gradlew # gradlew 실행권한 부여
-#RUN ./gradlew bootJar # gradlew를 사용하여 실행 가능한 jar 파일 생성
-#
-#FROM openjdk:11
-#COPY --from=builder build/libs/*.jar app.jar
-#
-#EXPOSE 8080
-#ENTRYPOINT ["java","-jar","/app.jar"]
-
-#FROM openjdk:8-jdk-alpine
-ARG JAR_FILE=build/libs/*.jar
-COPY /example/k8s_study/${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+FROM adoptopenjdk:11-jre-hotspot
+# the latest OpenJDK 8 with HotSpot JRE image + 배포용
+RUN mkdir /opt/app
+# 만들어진 파일(ex. demo-0.0.1-SNAPSHOT.jar)을 spring-boot-application.jar파일명으로 복사한다
+COPY --from=builder build/libs/*.jar /opt/app/spring-boot-application.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/opt/app/spring-boot-application.jar"]
