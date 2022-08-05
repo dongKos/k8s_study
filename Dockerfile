@@ -5,7 +5,7 @@ COPY build.gradle.kts .
 COPY gradle gradle
 COPY src src
 RUN chmod +x ./gradlew
-RUN ./gradlew bootJar
+RUN ./gradlew test bootJar
 
 FROM adoptopenjdk:11-jre-hotspot
 RUN mkdir /opt/app
